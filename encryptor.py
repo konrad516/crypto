@@ -10,5 +10,5 @@ class Encryptor:
         with open(file_name, 'rb') as file:
             text = file.read()
         enc = aes.encrypt(text)
-        with open(file_name + ".encrypted", 'wb') as file:
+        with open(file_name, 'wb') as file:
             file.write(enc)

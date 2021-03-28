@@ -1,6 +1,7 @@
 from settings import Settings
 from tkinter import *
 from PIL import Image, ImageTk
+from callbacks import Callbacks
 
 
 class Mainwindow:
@@ -14,6 +15,9 @@ class Mainwindow:
         self.root.title(self.settings.title)
         self.root.geometry(self.settings.geometry)
         self._set_background()
+        self.root.iconbitmap(self.settings.icon)
+
+        self.callbacks = Callbacks()
 
         # init entry text
         self.password = Entry(
@@ -23,11 +27,11 @@ class Mainwindow:
 
         # init buttons
         self.encryptionButton = Button(self.root, text="Encrypt",
-                                       padx=self.settings.padx, pady=self.settings.pady, command="")
+                                       padx=self.settings.padx, pady=self.settings.pady, command=self.callbacks.encrypt_button)
         self.encryptionButton.grid(row=2, column=0)
        # self.encryptionButton.pack()
         self.decryptionButton = Button(self.root, text="Decrypt",
-                                       padx=self.settings.padx, pady=self.settings.pady, command="")
+                                       padx=self.settings.padx, pady=self.settings.pady, command=self.callbacks.decrypt_button)
         self.decryptionButton.grid(row=2, column=2)
        # self.decryptionButton.pack()
 

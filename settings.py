@@ -8,6 +8,7 @@ class Settings:
         self.title = "Image Encryption"
         self.geometry = "640x409"
         self.bg_image = "background.jpg"
+        self.icon = "icon.ico"
 
         # define entry text settings
         self.entry_width = 50

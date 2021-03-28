@@ -10,5 +10,5 @@ class Decryptor:
         with open(file_name, 'rb') as file:
             text = file.read()
         dec = aes.decrypt(text)
-        with open(file_name + ".dec", 'wb') as file:
+        with open(file_name, 'wb') as file:
             file.write(dec)
