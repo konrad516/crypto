@@ -29,11 +29,14 @@ class Mainwindow:
         self.encryptionButton = Button(self.root, text="Encrypt",
                                        padx=self.settings.padx, pady=self.settings.pady, command=self.callbacks.encrypt_button)
         self.encryptionButton.grid(row=2, column=0)
-       # self.encryptionButton.pack()
+
         self.decryptionButton = Button(self.root, text="Decrypt",
                                        padx=self.settings.padx, pady=self.settings.pady, command=self.callbacks.decrypt_button)
         self.decryptionButton.grid(row=2, column=2)
-       # self.decryptionButton.pack()
+
+        self.decryptionButton = Button(self.root, text="Open file",
+                                       padx=self.settings.padx, pady=self.settings.pady, command=self.callbacks.open_file)
+        self.decryptionButton.grid(row=2, column=1)
 
     def _set_background(self):
         """set background image"""
