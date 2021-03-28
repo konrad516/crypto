@@ -5,4 +5,3 @@ from PIL import Image, ImageTk
 mainwindow = Mainwindow()
 
 mainwindow.loop()
-
