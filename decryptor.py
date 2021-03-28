@@ -1,14 +1,14 @@
 from aescipher import AESCipher
 
 
-class Encryptor:
+class Decryptor:
     def __init__(self, key):
         self.key = key
 
-    def encrypt_file(self, file_name):
+    def decrypt_file(self, file_name):
         aes = AESCipher(self.key)
         with open(file_name, 'rb') as file:
             text = file.read()
-        enc = aes.encrypt(text)
-        with open(file_name + ".encrypted", 'wb') as file:
-            file.write(enc)
+        dec = aes.decrypt(text)
+        with open(file_name + ".dec", 'wb') as file:
+            file.write(dec)
