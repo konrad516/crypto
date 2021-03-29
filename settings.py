@@ -9,6 +9,8 @@ class Settings:
         self.geometry = "640x409"
         self.bg_image = "background.jpg"
         self.icon = "icon.ico"
+        self.columnspan = 6
+        self.rowspan = 6
 
         # define entry text settings
         self.entry_width = 50

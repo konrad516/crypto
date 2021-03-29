@@ -1,33 +1,31 @@
 from tkinter import *
 from tkinter import messagebox
 from PIL import ImageTk, Image
-from tkinter import filedialog
 from decryptor import Decryptor
 from encryptor import Encryptor
 
+
 class Callbacks:
     """A class to manage callbacks from a buttons"""
-    
 
     def __init__(self):
+        self.key = None
         pass
 
-    def encrypt_button(self,passwd):
+    def encrypt_button(self, passwd, filename):
         response = messagebox.askyesno("Enrypt", "Are you sure?")
-        key = passwd.encode('UTF-8')
-        enc = Encryptor(key)
-        enc.encrypt_file(self.filename)
+        if(response):
+            self.key = passwd.encode('UTF-8')
+            enc = Encryptor(self.key)
+            enc.encrypt_file(filename)
         pass
 
-    def decrypt_button(self,passwd):
+    def decrypt_button(self, passwd, filename):
         response = messagebox.askyesno("Decrypt", "Are you sure?")
-        key = passwd.encode('UTF-8')
-        dec = Decryptor(key)
-        dec.decrypt_file(self.filename)
+        if(response):
+            self.key = passwd.encode('UTF-8')
+            dec = Decryptor(self.key)
+            dec.decrypt_file(filename)
         pass
 
-    def open_file(self):
-        # init open file dialog
-        self.filename = filedialog.askopenfilename(
-            initialdir="/", title="Select a file", filetype=(("all files", "*.*"), ("jpg files", "*.jpg")))
         pass
