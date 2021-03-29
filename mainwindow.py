@@ -30,7 +30,7 @@ class Mainwindow:
         # init entry local path
         self.path_text = Label(self.root, text="Local path: ")
         self.path_text.grid(row=2, column=2)
-        self.path_label = Label(self.root, text="please click below",
+        self.path_label = Label(self.root, text="please click below to load file",
                                 width=self.settings.entry_width, border=self.settings.entry_border)
         self.path_label.grid(row=2, column=3)
 
@@ -46,7 +46,7 @@ class Mainwindow:
                                        padx=self.settings.padx, pady=self.settings.pady, command=lambda: self.callbacks.decrypt_button(self.password.get(), self.path))
         self.decryptionButton.grid(row=3, column=4)
 
-        self.openButton = Button(self.root, text="Open file",
+        self.openButton = Button(self.root, text="Load file",
                                  padx=self.settings.padx, pady=self.settings.pady, command=self.open_file)
         self.openButton.grid(row=3, column=3)
 
@@ -62,6 +62,9 @@ class Mainwindow:
         # init open file dialog
         self.path = filedialog.askopenfilename(
             initialdir="/", title="Select a file")
+        self.path_label = Label(self.root, text=self.path,
+                                width=self.settings.entry_width, border=self.settings.entry_border)
+        self.path_label.grid(row=2, column=3)
 
     def loop(self):
         self.root.mainloop()
