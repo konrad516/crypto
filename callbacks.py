@@ -24,6 +24,7 @@ class Callbacks:
             self.key = passwd.encode('UTF-8')
             enc = Encryptor(self.key)
             enc.encrypt_file(filename)
+            messagebox.showinfo("Succes", "Encryption successful")
         pass
 
     def decrypt_button(self, passwd, filename):
@@ -38,6 +39,5 @@ class Callbacks:
             self.key = passwd.encode('UTF-8')
             dec = Decryptor(self.key)
             dec.decrypt_file(filename)
-        pass
-
+            messagebox.showinfo("Succes", "Decryption successful")
         pass
