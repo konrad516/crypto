@@ -16,6 +16,7 @@ class Mainwindow:
         self.root.geometry(self.settings.geometry)
         self._set_background()
         self.root.iconbitmap(self.settings.icon)
+        self.path=""
 
         self.callbacks = Callbacks()
 

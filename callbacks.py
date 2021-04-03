@@ -13,7 +13,11 @@ class Callbacks:
         pass
 
     def encrypt_button(self, passwd, filename):
-        response = messagebox.askyesno("Enrypt", "Are you sure?")
+        response=False
+        if (filename == ""):
+            messagebox.showerror("Error","Please select file!")
+        else:
+            response = messagebox.askyesno("Enrypt", "Are you sure?")
         if(response):
             self.key = passwd.encode('UTF-8')
             enc = Encryptor(self.key)
@@ -21,7 +25,11 @@ class Callbacks:
         pass
 
     def decrypt_button(self, passwd, filename):
-        response = messagebox.askyesno("Decrypt", "Are you sure?")
+        response=False
+        if (filename == ""):
+            messagebox.showerror("Error","Please select file!")
+        else:
+            response = messagebox.askyesno("Decrypt", "Are you sure?")
         if(response):
             self.key = passwd.encode('UTF-8')
             dec = Decryptor(self.key)
