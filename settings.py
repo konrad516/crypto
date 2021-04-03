@@ -9,16 +9,16 @@ class Settings:
         self.geometry = "640x409"
         self.bg_image = "background.jpg"
         self.icon = "icon.ico"
-        self.columnspan = 6
+        self.columnspan = 5
         self.rowspan = 6
 
         # define entry text settings
-        self.entry_width = 50
+        self.entry_width = 60
         self.entry_border = 5
 
         # define buttons settings
-        self.padx = 40
-        self.pady = 15
+        self.padx = 25
+        self.pady = 5
 
         # define AES settings
         self.BS = 16

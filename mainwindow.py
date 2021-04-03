@@ -11,7 +11,6 @@ class Mainwindow:
     def __init__(self):
         """Init the window"""
         self.root = Tk()
-
         self.settings = Settings()
         self.root.title(self.settings.title)
         self.root.geometry(self.settings.geometry)
@@ -22,17 +21,17 @@ class Mainwindow:
 
         # init entry text
         self.pass_label = Label(self.root, text="Password: ")
-        self.pass_label.grid(row=1, column=2)
+        self.pass_label.grid(row=1, column=0)
         self.password = Entry(
             self.root, show="*", width=self.settings.entry_width, border=self.settings.entry_border)
-        self.password.grid(row=1, column=3)
+        self.password.grid(row=1, column=2, columnspan=2)
 
         # init entry local path
         self.path_text = Label(self.root, text="Local path: ")
-        self.path_text.grid(row=2, column=2)
+        self.path_text.grid(row=2, column=0)
         self.path_label = Label(self.root, text="please click below to load file",
-                                width=self.settings.entry_width, border=self.settings.entry_border)
-        self.path_label.grid(row=2, column=3)
+                                width=self.settings.entry_width+4, border=self.settings.entry_border)
+        self.path_label.grid(row=2, column=2, columnspan=2)
 
         self.__buttons_init()
 
@@ -40,15 +39,15 @@ class Mainwindow:
         """funcion to manage buttons"""
         self.encryptionButton = Button(self.root, text="Encrypt",
                                        padx=self.settings.padx, pady=self.settings.pady, command=lambda: self.callbacks.encrypt_button(self.password.get(), self.path))
-        self.encryptionButton.grid(row=3, column=2)
+        self.encryptionButton.grid(row=3, column=4)
 
         self.decryptionButton = Button(self.root, text="Decrypt",
                                        padx=self.settings.padx, pady=self.settings.pady, command=lambda: self.callbacks.decrypt_button(self.password.get(), self.path))
-        self.decryptionButton.grid(row=3, column=4)
+        self.decryptionButton.grid(row=4, column=4)
 
         self.openButton = Button(self.root, text="Load file",
                                  padx=self.settings.padx, pady=self.settings.pady, command=self.open_file)
-        self.openButton.grid(row=3, column=3)
+        self.openButton.grid(row=2, column=4)
 
     def _set_background(self):
         """set background image"""
