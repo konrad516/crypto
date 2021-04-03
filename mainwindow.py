@@ -17,6 +17,7 @@ class Mainwindow:
         self._set_background()
         self.root.iconbitmap(self.settings.icon)
         self.path=""
+        self.password=""
 
         self.callbacks = Callbacks()
 
@@ -30,7 +31,7 @@ class Mainwindow:
         # init entry local path
         self.path_text = Label(self.root, text="Local path: ")
         self.path_text.grid(row=2, column=0)
-        self.path_label = Label(self.root, text="please click below to load file",
+        self.path_label = Label(self.root, text="Please click load file button to select a file",
                                 width=self.settings.entry_width+4, border=self.settings.entry_border)
         self.path_label.grid(row=2, column=2, columnspan=2)
 
