@@ -5,8 +5,8 @@ class Settings:
         """Init the program settings"""
 
         # define screen settings
-        self.title = "Image Encryption"
-        self.geometry = "640x409"
+        self.title = "Files Encryption"
+        self.geometry = "644x413"
         self.bg_image = "background.jpg"
         self.icon = "icon.ico"
         self.columnspan = 5
