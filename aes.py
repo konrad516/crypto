@@ -91,11 +91,19 @@ def mix_one_column(column):
     # copy arr column to column_temp
     column_temp = column.copy()
 
-    column[0] = (galios_multi(0x02, column_temp[0]) ^
-                 galios_multi(0x03, column_temp[1]) ^ column_temp[2] ^ column_temp[3])
-    column[1] = (column_temp[0] ^ galios_multi(0x02, column_temp[1]) ^
-                 galios_multi(0x03, column_temp[2]) ^ column_temp[3])
+    column[0] = (galios_multi(2, column_temp[0]) ^
+                 galios_multi(3, column_temp[1]) ^ column_temp[2] ^ column_temp[3])
+    column[1] = (column_temp[0] ^ galios_multi(2, column_temp[1]) ^
+                 galios_multi(3, column_temp[2]) ^ column_temp[3])
     column[2] = (column_temp[0] ^ column_temp[1] ^ galios_multi(
-                 0x02, column_temp[2]) ^ galios_multi(0x03, column_temp[3]))
-    column[3] = (galios_multi(0x03, column_temp[0]) ^ column_temp[1]
-                 ^ column_temp[2] ^ galios_multi(0x02, column_temp[3]))
+                 2, column_temp[2]) ^ galios_multi(3, column_temp[3]))
+    column[3] = (galios_multi(3, column_temp[0]) ^ column_temp[1]
+                 ^ column_temp[2] ^ galios_multi(2, column_temp[3]))
+
+
+def mix_one_column_inv(column):
+    """inverse mix column operation"""
+    """TODO"""
+    mix_one_column(column)
+    mix_one_column(column)
+    mix_one_column(column)
