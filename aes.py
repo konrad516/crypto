@@ -1,3 +1,4 @@
+from copy import copy
 aes_s_box = (
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
     0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -39,13 +40,13 @@ aes_inv_s_box = (
 
 def sub_bytes(state):
     """sub bytes transformation"""
-    for i in range(len(state)):
+    for i in range(16):
         state[i] = aes_s_box[state[i]]
 
 
 def sub_bytes_inv(state):
     """inverse sub bytes transformation"""
-    for i in range(len(state)):
+    for i in range(16):
         state[i] = aes_inv_s_box[state[i]]
 
 
@@ -53,9 +54,32 @@ def shift_rows(state):
     """shifts each row of 4x4 matrix (left)"""
     state = state[:4]+state[5:8]+state[4:5] + \
         state[10:12]+state[8:10]+state[15:]+state[12:15]
+    return state
 
 
 def shift_rows_inv(state):
     """shifts each row of 4x4 matrix (right)"""
     state = state[:4]+state[7:8]+state[4:7] + \
         state[10:12]+state[8:10]+state[13:]+state[12:13]
+    return state
+
+
+def add_round_key(state, round_key):
+    """set all index to xor of state and round_key"""
+    for i in range(16):
+        state[i] ^= round_key[i]
+
+
+# this function is implemennted using https://en.wikipedia.org/wiki/Rijndael_MixColumns#MixColumns
+def galios_multi(a, b):
+    """ Galois Field (256) Multiplication of two Bytes"""
+    p = 0
+    for i in range(8):
+        if (b & 1 != 0):
+            p ^= a
+        hi_bit_set = (a & 0x80) != 0
+        a <<= 1
+        if (hi_bit_set):
+            a ^= 0x1B  # * x^8 + x^4 + x^3 + x + 1 *
+        b >>= 1
+    return p
