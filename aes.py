@@ -37,13 +37,25 @@ aes_inv_s_box = (
 )
 
 
-def sub_bytes(s):
+def sub_bytes(state):
     """sub bytes transformation"""
-    for i in range(len(s)):
-        s[i] = aes_s_box[s[i]]
+    for i in range(len(state)):
+        state[i] = aes_s_box[state[i]]
 
 
-def sub_bytes_inv(s):
+def sub_bytes_inv(state):
     """inverse sub bytes transformation"""
-    for i in range(len(s)):
-        s[i] = aes_inv_s_box[s[i]]
+    for i in range(len(state)):
+        state[i] = aes_inv_s_box[state[i]]
+
+
+def shift_rows(state):
+    """shifts each row of 4x4 matrix (left)"""
+    state = state[:4]+state[5:8]+state[4:5] + \
+        state[10:12]+state[8:10]+state[15:]+state[12:15]
+
+
+def shift_rows_inv(state):
+    """shifts each row of 4x4 matrix (right)"""
+    state = state[:4]+state[7:8]+state[4:7] + \
+        state[10:12]+state[8:10]+state[13:]+state[12:13]
