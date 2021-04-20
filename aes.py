@@ -1,4 +1,5 @@
-from copy import copy
+from numpy import *
+
 aes_s_box = (
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
     0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -70,7 +71,7 @@ def add_round_key(state, round_key):
         state[i] ^= round_key[i]
 
 
-# this function is implemennted using https://en.wikipedia.org/wiki/Rijndael_MixColumns#MixColumns
+# this function is implemennted using https://en.wikipedia.org/wiki/Rijndael_MixColumns
 def galios_multi(a, b):
     """ Galois Field (256) Multiplication of two Bytes"""
     p = 0
@@ -80,6 +81,21 @@ def galios_multi(a, b):
         hi_bit_set = (a & 0x80) != 0
         a <<= 1
         if (hi_bit_set):
-            a ^= 0x1B  # * x^8 + x^4 + x^3 + x + 1 *
+            a ^= 0x1B  # x^8 + x^4 + x^3 + x + 1
         b >>= 1
-    return p
+    return p % 256
+
+
+def mix_one_column(column):
+    """ mix column operation using Rijndael cipher"""
+    # copy arr column to column_temp
+    column_temp = column.copy()
+
+    column[0] = (galios_multi(0x02, column_temp[0]) ^
+                 galios_multi(0x03, column_temp[1]) ^ column_temp[2] ^ column_temp[3])
+    column[1] = (column_temp[0] ^ galios_multi(0x02, column_temp[1]) ^
+                 galios_multi(0x03, column_temp[2]) ^ column_temp[3])
+    column[2] = (column_temp[0] ^ column_temp[1] ^ galios_multi(
+                 0x02, column_temp[2]) ^ galios_multi(0x03, column_temp[3]))
+    column[3] = (galios_multi(0x03, column_temp[0]) ^ column_temp[1]
+                 ^ column_temp[2] ^ galios_multi(0x02, column_temp[3]))
