@@ -107,3 +107,12 @@ def mix_one_column_inv(column):
     mix_one_column(column)
     mix_one_column(column)
     mix_one_column(column)
+
+
+def mix_columns(state):
+    """mix all collumns using Rijndael cipher"""
+    for i in range(4):
+        temp = [state[j*4+i] for j in range(4)]
+        mix_one_column(temp)
+        for j in range(4):
+            state[j*4+i] = temp[j]
