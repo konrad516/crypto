@@ -146,7 +146,22 @@ def mix_columns_inv(state):
             state[j*4+i] = temp[j]
 
 
-def expand_key(key):
+def key_expansion_core(input, i):
+    """sets input to rotation to the left and xor with rcon"""
+    input = input[i:]+input[0:i]
+    temp = []
+
+    temp.append(aes_s_box[input[0]])
+    temp.append(aes_s_box[input[1]])
+    temp.append(aes_s_box[input[2]])
+    temp.append(aes_s_box[input[3]])
+
+    temp[0] = temp[0] ^ rcon[i]
+    return temp
+
+
+def key_expand(key):
+    """take 16 bytes key and expand it to 176 bytes"""
     expandend_key = []
 
     for i in range(16):
@@ -169,9 +184,4 @@ def expand_key(key):
             expandend_key.append(
                 ((expandend_key[bytes_generated - 16]) ^ (temp[i])))
             bytes_generated += 1
-
-
-a = [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]
-a = expandKey(a, 16, 128)
-print(a)
+    return expandend_key
