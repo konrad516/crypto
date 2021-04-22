@@ -185,3 +185,37 @@ def key_expand(key):
                 ((expandend_key[bytes_generated - 16]) ^ (temp[i])))
             bytes_generated += 1
     return expandend_key
+
+
+def aes_enrypt(plaintext, expanded_key):
+    """enrypts plaintext using AES-128 enryption with given expanded_key"""
+    add_round_key(plaintext, expanded_key)
+
+    for i in range(9):
+        # 9 rounds AES128
+        sub_bytes(plaintext)
+        plaintext = shift_rows(plaintext)
+        mix_columns(plaintext)
+        add_round_key(plaintext, expanded_key + (16 * (i + 1)))
+
+    # final round
+    sub_bytes(plaintext)
+    plaintext = shift_rows(plaintext)
+    add_round_key(plaintext, expanded_key + 160)
+
+
+def aes_decrypt(plaintext, expanded_key):
+    """decytps plaintext using AES-128 enryption with given expanded_key"""
+    add_round_key(plaintext, expanded_key + 160)
+
+    for i in range(9, 0, -1):
+        # 9 rounds AES128
+        plaintext = shift_rows_inv(plaintext)
+        sub_bytes_inv(plaintext)
+        add_round_key(plaintext, expanded_key + (16 * (i + 1)))
+        mix_columns_inv(plaintext)
+
+    # final round
+    plaintext = shift_rows_inv(plaintext)
+    sub_bytes_inv(plaintext)
+    add_round_key(plaintext, expanded_key)
