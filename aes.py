@@ -228,6 +228,7 @@ def pad(plaintext, block_size=16):
     plaintext += bytes([length])*length
     return plaintext
 
+
 def unpad(plaintext):
     """Removes padding from plaintext"""
     padding_len = plaintext[-1]
@@ -235,3 +236,6 @@ def unpad(plaintext):
     return message
 
 
+def split_blocks(plaintext):
+    """split plaintext into 16 bytes blocks"""
+    return [plaintext[i:i+16] for i in range(0, len(plaintext), 16)]
