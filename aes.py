@@ -220,3 +220,18 @@ def aes_decrypt(plaintext, expanded_key):
     plaintext = shift_rows_inv(plaintext)
     sub_bytes_inv(plaintext)
     add_round_key(plaintext, expanded_key)
+
+
+def pad(plaintext, block_size=16):
+    """Adds a number bytes for plaintext to be multiple of 16 using PKCS#7 padding"""
+    length = block_size - (len(plaintext) % block_size)
+    plaintext += bytes([length])*length
+    return plaintext
+
+def unpad(plaintext):
+    """Removes padding from plaintext"""
+    padding_len = plaintext[-1]
+    message = plaintext[:-padding_len]
+    return message
+
+
