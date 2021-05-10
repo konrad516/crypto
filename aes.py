@@ -1,5 +1,3 @@
-from numpy import *
-
 aes_s_box = (
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
     0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -60,37 +58,44 @@ rcon = (
 
 def sub_bytes(state):
     """sub bytes transformation"""
-    for i in range(16):
-        state[i] = aes_s_box[state[i]]
+    for i in range(4):
+        for j in range(4):
+            state[i][j] = aes_s_box[state[i][j]]
+    return state
 
 
 def sub_bytes_inv(state):
     """inverse sub bytes transformation"""
-    for i in range(16):
-        state[i] = aes_inv_s_box[state[i]]
+    for i in range(4):
+        for j in range(4):
+            state[i][j] = aes_inv_s_box[state[i][j]]
+    return state
 
 
 def shift_rows(state):
     """shifts each row of 4x4 matrix (left)"""
-    state = state[:4]+state[5:8]+state[4:5] + \
-        state[10:12]+state[8:10]+state[15:]+state[12:15]
+    state[0][1], state[1][1], state[2][1], state[3][1] = state[1][1], state[2][1], state[3][1], state[0][1]
+    state[0][2], state[1][2], state[2][2], state[3][2] = state[2][2], state[3][2], state[0][2], state[1][2]
+    state[0][3], state[1][3], state[2][3], state[3][3] = state[3][3], state[0][3], state[1][3], state[2][3]
     return state
 
 
 def shift_rows_inv(state):
     """shifts each row of 4x4 matrix (right)"""
-    state = state[:4]+state[7:8]+state[4:7] + \
-        state[10:12]+state[8:10]+state[13:]+state[12:13]
+    state[0][1], state[1][1], state[2][1], state[3][1] = state[3][1], state[0][1], state[1][1], state[2][1]
+    state[0][2], state[1][2], state[2][2], state[3][2] = state[2][2], state[3][2], state[0][2], state[1][2]
+    state[0][3], state[1][3], state[2][3], state[3][3] = state[1][3], state[2][3], state[3][3], state[0][3]
     return state
 
 
 def add_round_key(state, round_key):
     """set all index to xor of state and round_key"""
-    for i in range(16):
-        state[i] ^= round_key[i]
+    for i in range(4):
+        for j in range(4):
+            state[i][j] ^= round_key[i][j]
+    return state
 
 
-# this function is implemennted using https://en.wikipedia.org/wiki/Rijndael_MixColumns
 def galios_multi(a, b):
     """ Galois Field (256) Multiplication of two Bytes"""
     p = 0
@@ -105,7 +110,7 @@ def galios_multi(a, b):
     return p % 256
 
 
-def mix_one_column(column):
+def mix_single_column(column):
     """ mix column operation using Rijndael cipher"""
     # copy arr column to column_temp
     column_temp = column.copy()
@@ -118,49 +123,44 @@ def mix_one_column(column):
                  2, column_temp[2]) ^ galios_multi(3, column_temp[3]))
     column[3] = (galios_multi(3, column_temp[0]) ^ column_temp[1]
                  ^ column_temp[2] ^ galios_multi(2, column_temp[3]))
+    return column
 
 
 def mix_one_column_inv(column):
     """inverse mix column operation"""
-    """TODO"""
-    mix_one_column(column)
-    mix_one_column(column)
-    mix_one_column(column)
+    mix_single_column(column)
+    mix_single_column(column)
+    mix_single_column(column)
+    return column
 
 
 def mix_columns(state):
     """mix all collumns using Rijndael cipher"""
     for i in range(4):
-        temp = [state[j*4+i] for j in range(4)]
-        mix_one_column(temp)
-        for j in range(4):
-            state[j*4+i] = temp[j]
+        mix_single_column(state[i])
+    return state
 
 
 def mix_columns_inv(state):
     """inverse mix all collumns using Rijndael cipher"""
     for i in range(4):
-        temp = [state[j*4+i] for j in range(4)]
-        mix_one_column_inv(temp)
-        for j in range(4):
-            state[j*4+i] = temp[j]
+        mix_one_column_inv(state[i])
+    return state
 
 
 def key_expansion_core(input, i):
     """sets input to rotation to the left and xor with rcon"""
-    input = input[i:]+input[0:i]
     temp = []
-
+    input.append(input.pop(0))
     temp.append(aes_s_box[input[0]])
     temp.append(aes_s_box[input[1]])
     temp.append(aes_s_box[input[2]])
     temp.append(aes_s_box[input[3]])
-
     temp[0] = temp[0] ^ rcon[i]
     return temp
 
 
-def key_expand(key):
+def expand_key(key):
     """take 16 bytes key and expand it to 176 bytes"""
     expandend_key = []
 
@@ -184,42 +184,12 @@ def key_expand(key):
             expandend_key.append(
                 ((expandend_key[bytes_generated - 16]) ^ (temp[i])))
             bytes_generated += 1
-    return expandend_key
 
-
-def aes_enrypt(plaintext, expanded_key):
-    """enrypts plaintext using AES-128 enryption with given expanded_key"""
-
-    add_round_key(plaintext, expanded_key)
-
-    for i in range(9):
-        # 9 rounds AES128
-        sub_bytes(plaintext)
-        plaintext = shift_rows(plaintext)
-        mix_columns(plaintext)
-        add_round_key(plaintext, expanded_key[16 * (i + 1):])
-
-    # final round
-    sub_bytes(plaintext)
-    plaintext = shift_rows(plaintext)
-    add_round_key(plaintext, expanded_key[160:])
-
-
-def aes_decrypt(plaintext, expanded_key):
-    """decytps plaintext using AES-128 enryption with given expanded_key"""
-    add_round_key(plaintext, expanded_key[160:])
-
-    for i in range(9, 0, -1):
-        # 9 rounds AES128
-        plaintext = shift_rows_inv(plaintext)
-        sub_bytes_inv(plaintext)
-        add_round_key(plaintext, expanded_key[16 * (i + 1):])
-        mix_columns_inv(plaintext)
-
-    # final round
-    plaintext = shift_rows_inv(plaintext)
-    sub_bytes_inv(plaintext)
-    add_round_key(plaintext, expanded_key)
+    key_columns = bytes_to_matrix(expandend_key)
+    result = []
+    for i in range(len(key_columns)):
+        result.append(bytes(key_columns[i]))
+    return [result[4*i: 4*(i+1)] for i in range(len(result) // 4)]
 
 
 def pad(plaintext, block_size=16):
@@ -232,10 +202,91 @@ def pad(plaintext, block_size=16):
 def unpad(plaintext):
     """Removes padding from plaintext"""
     padding_len = plaintext[-1]
-    message = plaintext[:-padding_len]
-    return message
+    return plaintext[:-padding_len]
 
 
 def split_blocks(plaintext):
     """split plaintext into 16 bytes blocks"""
     return [plaintext[i:i+16] for i in range(0, len(plaintext), 16)]
+
+
+def bytes_to_matrix(text):
+    """convert bytes into 4 x a 2D array"""
+    return [list(text[i:i+4]) for i in range(0, len(text), 4)]
+
+
+def matrix_to_bytes(matrix):
+    """Convert 2D array into byte array"""
+    temp = sum(matrix, [])
+    return bytearray(temp)
+
+
+def aes_rounds(plaintext, expanded_key):
+    """enrypts plaintext using AES-128 enryption with given expanded_key"""
+    add_round_key(plaintext, expanded_key[0])
+    for i in range(9):
+        plaintext = sub_bytes(plaintext)
+        plaintext = shift_rows(plaintext)
+        plaintext = mix_columns(plaintext)
+        plaintext = add_round_key(plaintext, expanded_key[i+1])
+    plaintext = sub_bytes(plaintext)
+    plaintext = shift_rows(plaintext)
+    plaintext = add_round_key(plaintext, expanded_key[-1])
+    return plaintext
+
+
+def aes_rounds_inv(ciphertext, expanded_key):
+    """decytps ciphertext using AES-128 enryption with given expanded_key"""
+    ciphertext = add_round_key(ciphertext, expanded_key[-1])
+    ciphertext = shift_rows_inv(ciphertext)
+    ciphertext = sub_bytes_inv(ciphertext)
+    for i in range(9, 0, -1):
+        ciphertext = add_round_key(ciphertext, expanded_key[i])
+        ciphertext = mix_columns_inv(ciphertext)
+        ciphertext = shift_rows_inv(ciphertext)
+        ciphertext = sub_bytes_inv(ciphertext)
+    ciphertext = add_round_key(ciphertext, expanded_key[0])
+    return ciphertext
+
+
+def aes_enrypt(plaintext, expanded_key):
+    """encrypt single block using AES-128 enryption with given expanded_key"""
+    plaintext = bytes_to_matrix(plaintext)
+    plaintext = aes_rounds(plaintext, expanded_key)
+    plaintext = matrix_to_bytes(plaintext)
+    return plaintext
+
+
+def aes_decrypt(ciphertext, expanded_key):
+    """decrypt single block using AES-128 enryption with given expanded_key"""
+    ciphertext = bytes_to_matrix(ciphertext)
+    ciphertext = aes_rounds_inv(ciphertext, expanded_key)
+    ciphertext = matrix_to_bytes(ciphertext)
+    return ciphertext
+
+
+def encrypt(key, iv, plaintext):
+    """CBC AES-128 enryption"""
+    plaintext = pad(plaintext)
+    result = []
+    previous = iv
+    for plaintext_block in split_blocks(plaintext):
+        """xor previous block with current block"""
+        temp = bytes(i ^ j for i, j in zip(plaintext_block, previous))
+        block = aes_enrypt(temp, key)
+        result.append(block)
+        previous = block
+    return b''.join(result)
+
+
+def decrypt(key, iv, ciphertext):
+    """CBC AES-128 decryption"""
+    result = []
+    previous = iv
+    for ciphertext_block in split_blocks(ciphertext):
+        temp = bytes(i ^ j for i, j in zip(
+            previous, aes_decrypt(ciphertext_block, key)))
+        result.append(temp)
+        previous = ciphertext_block
+    result = unpad(b''.join(result))
+    return result
