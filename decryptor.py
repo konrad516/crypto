@@ -1,4 +1,4 @@
-from aescipher import AESCipher
+from AESCipher import AESCipher
 
 
 class Decryptor:
