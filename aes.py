@@ -290,3 +290,12 @@ def decrypt(key, iv, ciphertext):
         previous = ciphertext_block
     result = unpad(b''.join(result))
     return result
+
+key = b'\x00' * 16
+iv = b'\x01' * 16
+key=expand_key(key)
+message = b'my message'
+cipher = encrypt(key,iv,message)
+print(cipher)
+plain = decrypt(key,iv,cipher)
+print(plain)
