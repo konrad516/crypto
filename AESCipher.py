@@ -2,7 +2,7 @@ import hashlib
 import base64
 from Crypto import Random
 from Crypto.Cipher import AES
-
+import aes
 
 class AESCipher(object):
     """Class for AES encryption"""
@@ -21,7 +21,20 @@ class AESCipher(object):
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
         # encrypt
         return base64.b64encode(iv + cipher.encrypt(text))
-        #return base64.b64encode(iv + cipher.encrypt(text.encode()))
+
+
+    def encrypt2(self, text):
+        """Encrypts 'text' text with a expanded key using implemented AES algorithm"""
+        # add padd
+        text = self._pad(text)
+        key=aes.expand_key(self.key)
+        # choose random initialization vector (IV)
+        iv = Random.new().read(AES.block_size)
+        # create AES CBC mode cipher
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        # encrypt
+        return base64.b64encode(iv + aes.encrypt(key,iv,text))
+
 
     def decrypt(self, text):
         """Decrypts encrypted 'text' with a self.key using AES algorithm"""
@@ -32,13 +45,21 @@ class AESCipher(object):
         # decrypt
         plaintext = cipher.decrypt(text[AES.block_size:])
         return plaintext.rstrip(b"\0")
-       # return self._unpad(cipher.decrypt(text[AES.block_size:]))
-        # return self._unpad(cipher.decrypt(text[AES.block_size:])).decode('utf-8')
+
+
+    def decrypt2(self, text):
+        """Decrypts encrypted 'text' with a expanded key using implemented AES algorithm"""
+        text = base64.b64decode(text)
+        iv = text[:AES.block_size]
+        key=aes.expand_key(self.key)
+        plaintext = aes.decrypt(key,iv,text[AES.block_size:])
+        return plaintext.rstrip(b"\0")
+
 
     def _pad(self, s):
         """Adds a number bytes for str to be multiple of 128"""
         return s + b"\0" * (AES.block_size - len(s) % AES.block_size)
-        #return str + (AES.block_size - len(str) % AES.block_size) * chr(AES.block_size - len(str) % AES.block_size)
+
 
     @staticmethod
     def _unpad(str):
